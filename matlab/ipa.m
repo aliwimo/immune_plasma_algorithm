@@ -10,7 +10,7 @@ pop_size = 30;
 dim_size = 30;
 NoD = 3;
 NoR = 3;
-t_max = 150000;
+t_max = 10000;
 t_cr = pop_size;
 bound = 100;
 
@@ -27,11 +27,6 @@ end
 [x_best_fit, x_best_index] = min(fitnesses);
 x_best = population(x_best_index, :);
 
-
-% x_k = population(1, :);
-% x_n = population(1, :);
-% x_m = population(2, :);
-% x_k_inf = infect(x_k, x_m);
 
 while t_cr < t_max
     
