@@ -60,9 +60,11 @@ while t_cr > t_max
         else
             break;
         end
+        
     end
     
     % plasma transfer
+    dose_control = ones(NoR);
     
     
     
@@ -96,4 +98,17 @@ function x_k = infect(x_k, x_m)
     x_k(j) = x_k(j) + rnd * (x_k(j) - x_m(j));
 end
 
-
+% get lists of indexes of donors and recievers
+function [d_indexes, r_indexes] = get_donors_recievers(fitnesses)
+    global NoD;
+    global NoR;
+    d_indexes = zeros(NoD);
+    r_indexes = zeros(NoR);
+    [~, sorted_indexes] = sort(fitnesses);
+    for i = 1:NoD
+        d_indexes(i) = sorted_indexes(i);
+    end
+    for i = NoR:-1:1
+        r_indexes(i) = sorted_indexes(i);
+    end
+end
