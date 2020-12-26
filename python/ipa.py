@@ -99,7 +99,6 @@ while T_CR < T_MAX:
                 if dose_control[i] == 1:
                     if x_k_rcv_p_fit < fitnesses[m]:
                         dose_control[i] += 1
-                        # here may be an error
                         population[k] = x_k_rcv_p.copy()
                         fitnesses[k] = x_k_rcv_p_fit
                     else:

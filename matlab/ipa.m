@@ -65,7 +65,47 @@ while t_cr > t_max
     
     % plasma transfer
     dose_control = ones(NoR);
+    [d_indexes, r_indexes] = get_donors_recievers(fitnesses);
+    treatment_control = ones(NoR);
+    for i = 1:NoR
+        k = r_indexes(i);
+        idx = randperm(length(d_indexes),1);
+        m = d_indexes(idx);
+        while treatment_control(i) == 1
+            if t_cr < t_max
+                t_cr = t_cr + 1;
+                x_k_rcv_p = give_plasma(population(k, :), population(m, :));
+                x_k_rcv_p_fit = fitness(x_k_rcv_p);
+                if dose_control(i) == 1
+                    if x_k_rcv_p_fit < fitnesses(m)
+                        dose_control(i) = dose_control(i) + 1;
+                        population(k, :) = x_k_rcv_p;
+                        fitnesses(k) = x_k_rcv_p_fit;
+                    else
+                        population(k, :) = population(m, :);
+                        fitnesses(k) = fitnesses(m);
+                        treatment_control(i) = 0;
+                    end
+                else
+                    if x_k_rcv_p_fit < fitnesses(k)
+                        population(k, :) = x_k_rcv_p;
+                        fitnesses(k) = x_k_rcv_p_fit;
+                    else
+                        treatment_control(i) = 0;
+                    end
+                end
+                if fitnesses(k) < x_best_fit
+                    x_best = population(k, :);
+                    x_best_fit = fitnesses(k);
+                    disp(x_best_fit);
+                end
+            else
+                break;
+            end
+        end
+    end
     
+    % donor update
     
     
 end
@@ -110,5 +150,13 @@ function [d_indexes, r_indexes] = get_donors_recievers(fitnesses)
     end
     for i = NoR:-1:1
         r_indexes(i) = sorted_indexes(i);
+    end
+end
+
+function x_k_rcv = give_plasma(x_k_rcv, x_m_dnr)
+    global dim_size;
+    for j = 1:dim_size
+        rnd = -1 + 2.*rand();
+        x_k_rcv(j) = x_k_rcv(j) + rnd * (x_k_rcv(j) - x_m_dnr(j));
     end
 end
