@@ -47,11 +47,23 @@ while t_cr > t_max
             x_k = population(k, :);
             x_m = population(m, :);
             x_k_inf = infect(x_k, x_m);
-            
+            x_k_inf_fit = fitness(x_k_inf);
+            if x_k_inf_fit < fitnesses(k)
+                population(k, :) = x_k_inf;
+                fitnesses(k) = x_k_inf_fit;
+                if fitnesses(k) < x_best_fit
+                    x_best = population(k, :);
+                    x_best_fit = fitnesses(k);
+                    disp(x_best_fit);
+                end
+            end
         else
             break;
         end
     end
+    
+    % plasma transfer
+    
     
     
 end
