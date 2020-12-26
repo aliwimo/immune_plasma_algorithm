@@ -4,14 +4,14 @@ import benchmark
 
 POP_SIZE    = 30
 DIM_SIZE    = 30
-T_MAX       = 200000
+T_MAX       = 10000
 T_CR        = POP_SIZE
-BOUND       = 10
+BOUND       = 100
 LB          = -BOUND
 UB          = BOUND
 NoD         = 1
 NoR         = 3
-OBJ_FUNC    = benchmark.schwefel_2_22
+OBJ_FUNC    = benchmark.sphere
 
 
 # generate population

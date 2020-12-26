@@ -6,13 +6,13 @@ global pop_size;
 global dim_size;
 global NoD;
 global NoR;
-pop_size = 5;
-dim_size = 3;
-NoD = 1;
-NoR = 1;
-t_max = 500;
+pop_size = 30;
+dim_size = 30;
+NoD = 3;
+NoR = 3;
+t_max = 150000;
 t_cr = pop_size;
-bound = 10;
+bound = 100;
 
 % generating initial population
 population = generate_population(-bound, bound);
@@ -33,8 +33,7 @@ x_best = population(x_best_index, :);
 % x_m = population(2, :);
 % x_k_inf = infect(x_k, x_m);
 
-% while t_cr < t_max
-while t_cr > t_max
+while t_cr < t_max
     
     % infection distribution
     for k = 1:pop_size
@@ -54,7 +53,6 @@ while t_cr > t_max
                 if fitnesses(k) < x_best_fit
                     x_best = population(k, :);
                     x_best_fit = fitnesses(k);
-                    disp(x_best_fit);
                 end
             end
         else
@@ -64,9 +62,9 @@ while t_cr > t_max
     end
     
     % plasma transfer
-    dose_control = ones(NoR);
+    dose_control = ones(NoR, 1);
     [d_indexes, r_indexes] = get_donors_recievers(fitnesses);
-    treatment_control = ones(NoR);
+    treatment_control = ones(NoR, 1);
     for i = 1:NoR
         k = r_indexes(i);
         idx = randperm(length(d_indexes),1);
@@ -97,7 +95,6 @@ while t_cr > t_max
                 if fitnesses(k) < x_best_fit
                     x_best = population(k, :);
                     x_best_fit = fitnesses(k);
-                    disp(x_best_fit);
                 end
             else
                 break;
@@ -106,10 +103,35 @@ while t_cr > t_max
     end
     
     % donor update
-    
+    for i = 1:NoD
+        if t_cr < t_max
+            t_cr = t_cr + 1;
+            m = d_indexes(i);
+            x_m_dnr = population(m, :);
+            if (t_cr / t_max) < rand()
+                x_m_dnr = update_donor(x_m_dnr);
+                population(m, :) = x_m_dnr;
+            else
+                for j = 1:dim_size
+                    population(m, j) = bound + (rand() * (bound - -bound));
+                end
+            end
+            fitnesses(m) = fitness(population(m, :));
+            
+            if fitnesses(m) < x_best_fit
+                x_best = population(m, :);
+                x_best_fit = fitnesses(m);
+            end
+            
+        else
+            break;
+        end
+    end
     
 end
 
+disp(t_cr);
+disp(x_best_fit);
 
 % ----------------------------------------------------- %
 % --------------------- FUNCTIONS --------------------- %
@@ -142,8 +164,8 @@ end
 function [d_indexes, r_indexes] = get_donors_recievers(fitnesses)
     global NoD;
     global NoR;
-    d_indexes = zeros(NoD);
-    r_indexes = zeros(NoR);
+    d_indexes = zeros(NoD, 1);
+    r_indexes = zeros(NoR, 1);
     [~, sorted_indexes] = sort(fitnesses);
     for i = 1:NoD
         d_indexes(i) = sorted_indexes(i);
@@ -158,5 +180,14 @@ function x_k_rcv = give_plasma(x_k_rcv, x_m_dnr)
     for j = 1:dim_size
         rnd = -1 + 2.*rand();
         x_k_rcv(j) = x_k_rcv(j) + rnd * (x_k_rcv(j) - x_m_dnr(j));
+    end
+end
+
+% update donor with equation 5
+function x_m_dnr = update_donor(x_m_dnr)
+    global dim_size;
+    for j = 1:dim_size
+        rnd = -1 + 2.*rand();
+        x_m_dnr(j) = x_m_dnr(j) + rnd * x_m_dnr(j);
     end
 end
