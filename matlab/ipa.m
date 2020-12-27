@@ -8,9 +8,9 @@ global NoD;
 global NoR;
 pop_size = 30;
 dim_size = 30;
-NoD = 3;
-NoR = 3;
-t_max = 10000;
+NoD = 1;
+NoR = 1;
+t_max = 150000;
 t_cr = pop_size;
 bound = 100;
 
@@ -135,7 +135,7 @@ disp(x_best_fit);
 function pop = generate_population(LB, UB)
     global pop_size;
     global dim_size;
-    pop = zeros(pop_size, dim_size);
+    pop = zeros(pop_size, 1);
     for k = 1:pop_size
         for j = 1:dim_size
             pop(k, j) = LB + (rand() * (UB - LB));
@@ -165,8 +165,8 @@ function [d_indexes, r_indexes] = get_donors_recievers(fitnesses)
     for i = 1:NoD
         d_indexes(i) = sorted_indexes(i);
     end
-    for i = NoR:-1:1
-        r_indexes(i) = sorted_indexes(i);
+    for i = 1:NoR
+        r_indexes(i) = sorted_indexes(end - (i - 1));
     end
 end
 
