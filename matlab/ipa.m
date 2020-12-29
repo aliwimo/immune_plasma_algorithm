@@ -8,8 +8,8 @@ global NoD;
 global NoR;
 pop_size = 30;
 dim_size = 30;
-NoD = 1;
-NoR = 1;
+NoD = 2;
+NoR = 3;
 t_max = 150000;
 t_cr = pop_size;
 bound = 100;
@@ -125,7 +125,6 @@ while t_cr < t_max
     
 end
 
-disp(t_cr);
 disp(x_best_fit);
 
 % ----------------------------------------------------- %
