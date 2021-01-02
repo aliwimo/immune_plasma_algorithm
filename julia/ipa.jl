@@ -20,11 +20,24 @@ function generate_population()
     return population
 end
 
+function fitness(x)
+    sum = 0
+    for j = 1:dim_size
+        sum += (x[j] ^ 2)
+    end
+    return sum
+end
+
 pop = generate_population()
 
+# calculating fitness of population
+fitnesses = zeros(pop_size)
+for i = 1:pop_size
+    fitnesses[i] = fitness(pop[i, :])
+end
 
 println(pop)
-
+println(fitnesses)
 
 
 println("---------------------------------------")
