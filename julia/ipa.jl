@@ -1,3 +1,5 @@
+using Distributions
+println("---------------------------------------")
 
 
 pop_size = 5
@@ -28,16 +30,60 @@ function fitness(x)
     return sum
 end
 
-pop = generate_population()
+function infect(x_k, x_m)
+    j = rand(1:dim_size)
+    x_k[j] += rand(Uniform(-1, 1)) * (x_k[j] - x_m[j])
+    return x_k
+end
+
+population = generate_population()
 
 # calculating fitness of population
 fitnesses = zeros(pop_size)
 for i = 1:pop_size
-    fitnesses[i] = fitness(pop[i, :])
+    fitnesses[i] = fitness(population[i, :])
 end
 
-println(pop)
-println(fitnesses)
 
+# find best individual among population
+x_best_index = argmin(fitnesses)
+x_best = copy(population[x_best_index, :])
+x_best_fit = fitnesses[x_best_index]
+
+println(x_best_fit)
+
+
+# while t_cr < t_max
+if t_cr < t_max
+
+    # infection distirbution
+    for k = 1:pop_size
+        if t_cr < t_max
+            global t_cr += 1
+            m = rand(1:pop_size)
+            while m == k
+                m = rand(1:pop_size)
+            end
+            x_k = copy(population[k, :])
+            x_m = copy(population[m, :])
+            x_k_inf = infect(x_k, x_m)
+            x_k_inf_fit = fitness(x_k_inf)
+            if x_k_inf_fit < fitnesses[k]
+                population[k, :] = copy(x_k_inf)
+                fitnesses[k] = x_k_inf_fit
+                if x_k_inf_fit < x_best_fit
+                    global x_best = copy(x_k_inf)
+                    global x_best_fit = x_k_inf_fit
+                    println(x_best_fit)
+                end
+            end
+        else
+            break
+        end
+    end
+
+    
+end
 
 println("---------------------------------------")
+
