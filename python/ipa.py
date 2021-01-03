@@ -9,11 +9,11 @@ T_CR        = POP_SIZE
 BOUND       = 100
 LB          = -BOUND
 UB          = BOUND
-NoD         = 3
+NoD         = 1
 NoR         = 1
 OBJ_FUNC    = benchmark.sphere
 
-display_results = False
+display_results = True
 
 
 # generate population
@@ -60,7 +60,7 @@ fitnesses = [fitness(i) for i in population]
 
 x_best_index = fitnesses.index(min(fitnesses))
 x_best = population[x_best_index].copy()
-x_best_fit = fitness(x_best)
+x_best_fit = fitnesses[x_best_index]
 
 
 while T_CR < T_MAX:
@@ -76,7 +76,7 @@ while T_CR < T_MAX:
             x_m = population[m].copy()
             x_k_inf = infect(x_k, x_m)
             x_k_inf_fit = fitness(x_k_inf)
-            if (x_k_inf_fit < fitnesses[k]):
+            if x_k_inf_fit < fitnesses[k]:
                 population[k] = x_k_inf.copy()
                 fitnesses[k] = x_k_inf_fit
                 if x_k_inf_fit < x_best_fit:
