@@ -13,6 +13,8 @@ NoD         = 3
 NoR         = 1
 OBJ_FUNC    = benchmark.sphere
 
+display_results = False
+
 
 # generate population
 def generate_population():
@@ -80,7 +82,8 @@ while T_CR < T_MAX:
                 if x_k_inf_fit < x_best_fit:
                     x_best = x_k_inf.copy()
                     x_best_fit = x_k_inf_fit
-                    print(x_best_fit)
+                    if display_results:
+                        print(x_best_fit)
         else:
             break
     
@@ -115,7 +118,8 @@ while T_CR < T_MAX:
                 if fitnesses[k] < x_best_fit:
                     x_best = population[k].copy()
                     x_best_fit = fitnesses[k]
-                    print(x_best_fit)
+                    if display_results:
+                        print(x_best_fit)
             else:
                 break
 
@@ -135,7 +139,8 @@ while T_CR < T_MAX:
             if fitnesses[m] < x_best_fit:
                 x_best = population[m].copy()
                 x_best_fit = fitnesses[m]
-                print(x_best_fit)
+                if display_results:
+                    print(x_best_fit)
         else:
             break
             
