@@ -4,13 +4,13 @@ import benchmark
 
 POP_SIZE    = 30
 DIM_SIZE    = 30
-T_MAX       = 10000
+T_MAX       = 150000
 T_CR        = POP_SIZE
 BOUND       = 100
 LB          = -BOUND
 UB          = BOUND
-NoD         = 1
-NoR         = 3
+NoD         = 3
+NoR         = 1
 OBJ_FUNC    = benchmark.sphere
 
 
@@ -125,7 +125,7 @@ while T_CR < T_MAX:
             T_CR += 1
             m = d_indexes[i]
             x_m_dnr = population[m].copy()
-            if (T_CR / T_MAX) < random():
+            if (T_CR / T_MAX) > random():
                 x_m_dnr = update_donor(x_m_dnr)
                 population[m] = x_m_dnr.copy()
             else:
@@ -139,3 +139,4 @@ while T_CR < T_MAX:
         else:
             break
             
+print(x_best_fit)
