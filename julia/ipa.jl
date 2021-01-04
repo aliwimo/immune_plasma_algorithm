@@ -11,7 +11,7 @@ NoD = 1
 NoR = 1
 
 function generate_population()
-    population = zeros(pop_size, dim_size)
+    population = zeros(Float64, pop_size, dim_size)
     for k = 1:pop_size
         for j = 1:dim_size
             population[k, j] = LB + rand() * (UB - LB)
@@ -65,6 +65,14 @@ function update_donor(x_m_dnr)
     return x_m_dnr
 end
 
+function compare_with_best(x)
+    if fitness(x) < x_best_fit
+        global x_best = copy(x)
+        global x_best_fit = fitness(x)
+        println(x_best_fit)
+    end
+end
+
 
 population = generate_population()
 
@@ -82,13 +90,8 @@ x_best_fit = fitnesses[x_best_index]
 
 println(x_best_fit)
 
-infection = 0
-transfer = 0
-update = 0
-
 while t_cr < t_max
 
-    global infection += 1
     # infection distirbution
     for k = 1:pop_size
         if t_cr < t_max
@@ -104,11 +107,12 @@ while t_cr < t_max
             if x_k_inf_fit < fitnesses[k]
                 population[k, :] = copy(x_k_inf)
                 fitnesses[k] = x_k_inf_fit
-                if x_k_inf_fit < x_best_fit
-                    global x_best = copy(x_k_inf)
-                    global x_best_fit = x_k_inf_fit
-                    # println(x_best_fit)
-                end
+                compare_with_best(x_k_inf)
+                # if x_k_inf_fit < x_best_fit
+                #     global x_best = copy(x_k_inf)
+                #     global x_best_fit = x_k_inf_fit
+                #     # println(x_best_fit)
+                # end
             end
         else
             break
@@ -116,7 +120,6 @@ while t_cr < t_max
     end
 
     # plasma transfer
-    global transfer += 1
     dose_control = ones(Int64, NoR)
     d_indexes, r_indexes = get_donors_receivers(fitnesses)
     treatment_control = ones(Int64, NoR)
@@ -147,11 +150,7 @@ while t_cr < t_max
                     end
                 end
 
-                if fitnesses[k] < x_best_fit
-                    global x_best = copy(population[k, :])
-                    global x_best_fit = fitnesses[k]
-                    # println(x_best_fit)
-                end
+                compare_with_best(population[k, :])
             else
                 break
             end
@@ -159,7 +158,6 @@ while t_cr < t_max
     end
 
     # Donor update
-    global update += 1
     for i = 1:NoD
         if t_cr < t_max
             global t_cr += 1
@@ -175,19 +173,11 @@ while t_cr < t_max
             end
             fitnesses[m] = fitness(population[m, :])
             
-            if fitnesses[m] < x_best_fit
-                global x_best = copy(population[m, :])
-                global x_best_fit = fitnesses[m]
-                # println(x_best_fit)
-            end
+            compare_with_best(population[m, :])
         else
             break
         end
     end
 end
-println(x_best_fit)
-println("T_CR: $t_cr")
-println("infection: $infection")
-println("transfer: $transfer")
-println("update: $update")
 
+println(x_best_fit)
