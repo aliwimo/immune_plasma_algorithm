@@ -36,6 +36,20 @@ function infect(x_k, x_m)
     return x_k
 end
 
+# get lists of indexes of donors and receivers
+function get_donors_receivers(fitnesses)
+    d_indexes = zeros(NoD)
+    r_indexes = zeros(NoR)
+    sorted_indexes = sortperm(x)
+    for i = 1:NoD
+        d_indexes[i] = sorted_indexes[i]
+    end
+    reverse!(sorted_indexes)
+    for i = 1:NoR
+        r_indexes[i] = sorted_indexes[i]
+    end
+end
+
 population = generate_population()
 
 # calculating fitness of population
@@ -82,7 +96,10 @@ if t_cr < t_max
         end
     end
 
-    
+    # plasma transfer
+    dose_control = ones(NoR)
+
+    treatment_control = ones(NoR)
 end
 
 println("---------------------------------------")
