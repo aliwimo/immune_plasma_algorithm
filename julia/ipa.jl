@@ -48,6 +48,15 @@ function get_donors_receivers(fitnesses)
     for i = 1:NoR
         r_indexes[i] = sorted_indexes[i]
     end
+    return d_indexes, r_indexes
+end
+
+# plasma donation to infected indiviual
+function give_plasma(x_k_rcv, x_m_dnr)
+    for j = 1:dim_size
+        x_k_rcv[j] += rand(Uniform(-1, 1)) * (x_k_rcv[j] - x_m_dnr[j])
+    end
+    return x_k_rcv
 end
 
 population = generate_population()
@@ -98,8 +107,20 @@ if t_cr < t_max
 
     # plasma transfer
     dose_control = ones(NoR)
-
+    d_indexes, r_indexes = get_donors_receivers(fitnesses)
     treatment_control = ones(NoR)
+    for i = 1:NoR
+        k = r_indexes[i]
+        m = rand(1:NoD)
+        while treatment_control[i] == 1
+            if t_cr < t_max
+                global t_cr += 1
+                
+            else
+                break
+            end
+        end
+    end
 end
 
 println("---------------------------------------")
