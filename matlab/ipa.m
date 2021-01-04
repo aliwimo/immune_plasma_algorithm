@@ -8,18 +8,18 @@ addpath('./benchmark/');
 
 % global variables and parameteres
 global objective_function;
-objective_function = @schwefel_2_22;
+objective_function = @rosenbrock;
 global pop_size; 
 global dim_size;
 global NoD;
 global NoR;
 pop_size = 30;
 dim_size = 30;
-NoD = 2;
-NoR = 3;
-t_max = 200000;
+NoD = 1;
+NoR = 1;
+t_max = 500000;
 t_cr = pop_size;
-bound = 10;
+bound = 30;
 
 
 
