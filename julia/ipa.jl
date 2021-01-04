@@ -115,12 +115,39 @@ if t_cr < t_max
         while treatment_control[i] == 1
             if t_cr < t_max
                 global t_cr += 1
-                
+                x_k_rcv_p = give_plasma(population[k, :], population[m, :])
+                x_k_rcv_p_fit = fitness(x_k_rcv_p)
+                if dose_control[i] == 1
+                    if x_k_rcv_p_fit < fitnesses[m]
+                        dose_control[i] += 1
+                        population[k, :] = copy(x_k_rcv_p)
+                        fitnesses[k] = x_k_rcv_p_fit
+                    else
+                        population[k, :] = copy(population[m, :])
+                        fitnesses[k] = fitnesses[m]
+                        treatment_control[i] = 0
+                    end
+                else
+                    if x_k_rcv_p_fit < fitnesses[k]
+                        population[k, :] = copy(x_k_rcv_p)
+                        fitnesses[k] = x_k_rcv_p_fit
+                    else
+                        treatment_control[i] = 0
+                    end
+                end
+
+                if fitnesses[k] < x_best_fit
+                    global x_best = copy(population[k, :])
+                    global x_best_fit = fitnesses[k]
+                    println(x_best_fit)
+                end
             else
                 break
             end
         end
     end
+
+    
 end
 
 println("---------------------------------------")
