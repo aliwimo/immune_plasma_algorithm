@@ -1,5 +1,5 @@
 python/__pycache__
-matlab/*.asv
+matlab/**/*.asv
 C
 .vscode
 */test.*
