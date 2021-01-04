@@ -4,16 +4,16 @@ import benchmark
 
 POP_SIZE    = 30
 DIM_SIZE    = 30
-T_MAX       = 150000
+T_MAX       = 500000
 T_CR        = POP_SIZE
-BOUND       = 100
+BOUND       = 30
 LB          = -BOUND
 UB          = BOUND
 NoD         = 1
 NoR         = 1
-OBJ_FUNC    = benchmark.sphere
+OBJ_FUNC    = benchmark.rosenbrock
 
-display_results = True
+display_results = False
 
 
 # generate population
