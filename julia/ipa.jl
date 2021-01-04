@@ -60,6 +60,15 @@ function give_plasma(x_k_rcv, x_m_dnr)
     return x
 end
 
+# update donor with equation 5
+function update_donor(x_m_dnr)
+    for j = 1:dim_size
+        x_m_dnr[j] += rand(Uniform(-1, 1)) * x_m_dnr[j]
+    end
+    return x_m_dnr
+end
+
+
 population = generate_population()
 
 # calculating fitness of population
@@ -148,7 +157,18 @@ if 1 == 1
         end
     end
 
-
+    # Donor update
+    for i = 1:NoD
+        if t_cr < t_max
+            global t_cr += 1
+            m = d_indexes[i]
+            x_m_dnr = copy(population[m, :])
+            if (t_cr / t_max) > rand()
+                x_m_dnr = 1
+        else
+            break
+        end
+    end
 end
 
 println("---------------------------------------")
