@@ -1,16 +1,14 @@
 using Distributions
-println("---------------------------------------")
 
-
-pop_size = 5
-dim_size = 3
-t_max = 10000
+pop_size = 30
+dim_size = 30
+t_max = 150000
 t_cr = pop_size
 bound = 100
 LB = -bound
 UB = bound
 NoD = 1
-NoR = 3
+NoR = 1
 
 function generate_population()
     population = zeros(pop_size, dim_size)
@@ -53,11 +51,10 @@ end
 
 # plasma donation to infected indiviual
 function give_plasma(x_k_rcv, x_m_dnr)
-    x = zeros(1, dim_size)
     for j = 1:dim_size
-        x[j] = x_k_rcv[j] + rand(Uniform(-1, 1)) * (x_k_rcv[j] - x_m_dnr[j])
+        x_k_rcv[j] += rand(Uniform(-1, 1)) * (x_k_rcv[j] - x_m_dnr[j])
     end
-    return x
+    return x_k_rcv
 end
 
 # update donor with equation 5
@@ -85,10 +82,13 @@ x_best_fit = fitnesses[x_best_index]
 
 println(x_best_fit)
 
+infection = 0
+transfer = 0
+update = 0
 
-# while t_cr < t_max
-if 1 == 1
+while t_cr < t_max
 
+    global infection += 1
     # infection distirbution
     for k = 1:pop_size
         if t_cr < t_max
@@ -107,7 +107,7 @@ if 1 == 1
                 if x_k_inf_fit < x_best_fit
                     global x_best = copy(x_k_inf)
                     global x_best_fit = x_k_inf_fit
-                    println(x_best_fit)
+                    # println(x_best_fit)
                 end
             end
         else
@@ -116,9 +116,10 @@ if 1 == 1
     end
 
     # plasma transfer
-    dose_control = ones(NoR)
+    global transfer += 1
+    dose_control = ones(Int64, NoR)
     d_indexes, r_indexes = get_donors_receivers(fitnesses)
-    treatment_control = ones(NoR)
+    treatment_control = ones(Int64, NoR)
     for i = 1:NoR
         k = r_indexes[i]
         m = Int(rand(1:NoD))
@@ -149,7 +150,7 @@ if 1 == 1
                 if fitnesses[k] < x_best_fit
                     global x_best = copy(population[k, :])
                     global x_best_fit = fitnesses[k]
-                    println(x_best_fit)
+                    # println(x_best_fit)
                 end
             else
                 break
@@ -158,18 +159,35 @@ if 1 == 1
     end
 
     # Donor update
+    global update += 1
     for i = 1:NoD
         if t_cr < t_max
             global t_cr += 1
             m = d_indexes[i]
             x_m_dnr = copy(population[m, :])
             if (t_cr / t_max) > rand()
-                x_m_dnr = 1
+                x_m_dnr = update_donor(x_m_dnr)
+                population[m, :] = copy(x_m_dnr)
+            else
+                for j = 1:dim_size
+                    population[m, j] = LB + rand() * (UB - LB)
+                end
+            end
+            fitnesses[m] = fitness(population[m, :])
+            
+            if fitnesses[m] < x_best_fit
+                global x_best = copy(population[m, :])
+                global x_best_fit = fitnesses[m]
+                # println(x_best_fit)
+            end
         else
             break
         end
     end
 end
-
-println("---------------------------------------")
+println(x_best_fit)
+println("T_CR: $t_cr")
+println("infection: $infection")
+println("transfer: $transfer")
+println("update: $update")
 
