@@ -38,9 +38,9 @@ end
 
 # get lists of indexes of donors and receivers
 function get_donors_receivers(fitnesses)
-    d_indexes = zeros(NoD)
-    r_indexes = zeros(NoR)
-    sorted_indexes = sortperm(x)
+    d_indexes = zeros(Int64, NoD)
+    r_indexes = zeros(Int64, NoR)
+    sorted_indexes = sortperm(fitnesses)
     for i = 1:NoD
         d_indexes[i] = sorted_indexes[i]
     end
@@ -53,10 +53,11 @@ end
 
 # plasma donation to infected indiviual
 function give_plasma(x_k_rcv, x_m_dnr)
+    x = zeros(1, dim_size)
     for j = 1:dim_size
-        x_k_rcv[j] += rand(Uniform(-1, 1)) * (x_k_rcv[j] - x_m_dnr[j])
+        x[j] = x_k_rcv[j] + rand(Uniform(-1, 1)) * (x_k_rcv[j] - x_m_dnr[j])
     end
-    return x_k_rcv
+    return x
 end
 
 population = generate_population()
@@ -77,7 +78,7 @@ println(x_best_fit)
 
 
 # while t_cr < t_max
-if t_cr < t_max
+if 1 == 1
 
     # infection distirbution
     for k = 1:pop_size
@@ -111,7 +112,7 @@ if t_cr < t_max
     treatment_control = ones(NoR)
     for i = 1:NoR
         k = r_indexes[i]
-        m = rand(1:NoD)
+        m = Int(rand(1:NoD))
         while treatment_control[i] == 1
             if t_cr < t_max
                 global t_cr += 1
@@ -147,7 +148,7 @@ if t_cr < t_max
         end
     end
 
-    
+
 end
 
 println("---------------------------------------")
