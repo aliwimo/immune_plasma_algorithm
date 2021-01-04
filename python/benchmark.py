@@ -61,3 +61,10 @@ def schwefel_2_22(X):
     inner_sum = np.sum(abs_list)
     inner_prod = np.prod(abs_list)
     return inner_sum + inner_prod
+
+def rosenbrock(x):
+    dimension_size = len(x)
+    total_sum = 0
+    for i in range(dimension_size - 1):
+        total_sum += ( 100 * (x[i + 1] - x[i]**2)**2 + (x[i] - 1)**2 )
+    return total_sum
