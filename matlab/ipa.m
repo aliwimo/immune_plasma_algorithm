@@ -1,7 +1,14 @@
 clc;
 clear;
 
+% importing benchmark functions
+addpath('./benchmark/');
+
+
+
 % global variables and parameteres
+global objective_function;
+objective_function = @schwefel_2_22;
 global pop_size; 
 global dim_size;
 global NoD;
@@ -10,9 +17,14 @@ pop_size = 30;
 dim_size = 30;
 NoD = 2;
 NoR = 3;
-t_max = 150000;
+t_max = 200000;
 t_cr = pop_size;
-bound = 100;
+bound = 10;
+
+
+
+
+
 
 % generating initial population
 population = generate_population(-bound, bound);
@@ -142,10 +154,6 @@ function pop = generate_population(LB, UB)
     end
 end
 
-% sphere function
-function fit = fitness(x)
-    fit = sumsqr(x(1,:));
-end
 
 function x_k = infect(x_k, x_m)
     global dim_size;
@@ -184,4 +192,18 @@ function x_m_dnr = update_donor(x_m_dnr)
         rnd = -1 + 2.*rand();
         x_m_dnr(j) = x_m_dnr(j) + rnd * x_m_dnr(j);
     end
+end
+
+% compare with best
+function compare_with_best(x)
+    global x_best_fit
+    if fitness(x) < x_best_fit
+        x_best_fit = fitness(x);
+    end
+end
+
+% sphere function
+function fit = fitness(x)
+    global objective_function;
+    fit = objective_function(x);
 end
