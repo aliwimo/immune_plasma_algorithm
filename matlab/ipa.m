@@ -4,206 +4,232 @@ clear;
 % importing benchmark functions
 addpath('./benchmark/');
 
-
-
-% global variables and parameteres
+% initlizing global variables
 global objective_function;
-objective_function = @rosenbrock;
-global pop_size; 
-global dim_size;
-global NoD;
-global NoR;
-pop_size = 30;
-dim_size = 30;
-NoD = 1;
-NoR = 1;
-t_max = 500000;
-t_cr = pop_size;
-bound = 30;
+global population_size; 
+global dimension_size;
+global donors_number;
+global receivers_number;
+
+% set objective function from the list in "benchmark" directory
+objective_function = @sphere;
+
+% set initial parameters' values
+population_size = 30;
+dimension_size = 30;
+donors_number = 1;
+receivers_number = 1;
+maximum_evaluations = 150000;
+bounds = [-100, 100];
+
+% other dependent parameters, no need to change
+current_evaluation = population_size;
+lower_bound = bounds(1);
+upper_bound = bounds(2);
 
 
-
-
-
+% ----------------------------------------------------- %
+% ---------------- START OF ALGORITHM ----------------- %
+% ----------------------------------------------------- %   
 
 % generating initial population
-population = generate_population(-bound, bound);
+population = generate_population(lower_bound, upper_bound);
 
 % calculating fitness of population
-fitnesses = zeros(pop_size, 1);
-for i = 1:pop_size
-   fitnesses(i) = fitness(population(i, :)); 
-end
+fitnesses = calculate_fitnesses(population);
 
-% finding best individual
-[x_best_fit, x_best_index] = min(fitnesses);
-x_best = population(x_best_index, :);
+% finding best individual fitness
+global best_fitness
+best_fitness = min(fitnesses);
+
+% print initial best fitness value
+fprintf('Initial best fitness value: %d\n', best_fitness);
 
 
-while t_cr < t_max
+while current_evaluation < maximum_evaluations
     
-    % infection distribution
-    for k = 1:pop_size
-        if t_cr < t_max
-            t_cr = t_cr + 1;
-            m = randi([1 pop_size]);
-            while m == k
-            	m = randi([1 pop_size]);
+    
+    % start of infection phase
+    for index = 1:population_size
+        if current_evaluation < maximum_evaluations
+            current_evaluation = current_evaluation + 1;
+            random_index = get_random_index_of(population);
+            while random_index == index
+            	random_index = get_random_index_of(population);
             end
-            x_k = population(k, :);
-            x_m = population(m, :);
-            x_k_inf = infect(x_k, x_m);
-            x_k_inf_fit = fitness(x_k_inf);
-            if x_k_inf_fit < fitnesses(k)
-                population(k, :) = x_k_inf;
-                fitnesses(k) = x_k_inf_fit;
-                if fitnesses(k) < x_best_fit
-                    x_best = population(k, :);
-                    x_best_fit = fitnesses(k);
-                end
+            x_k = population(index, :);
+            x_m = population(random_index, :);
+            infected_individual = perform_infection(x_k, x_m);
+            fitness_of_infected = fitness(infected_individual);
+            if fitness_of_infected < fitnesses(index)
+                population(index, :) = infected_individual;
+                fitnesses(index) = fitness_of_infected;
+                compare_with_best_fitness(infected_individual);
             end
         else
-            break;
+            break; % if exceeded maximum evaluation number
         end
-        
     end
     
-    % plasma transfer
-    dose_control = ones(NoR, 1);
-    [d_indexes, r_indexes] = get_donors_recievers(fitnesses);
-    treatment_control = ones(NoR, 1);
-    for i = 1:NoR
-        k = r_indexes(i);
-        idx = randperm(length(d_indexes),1);
-        m = d_indexes(idx);
+    
+    
+    % start of plasma transfering phase
+    % generating dose_control and treatment_control vectors
+    dose_control = ones(receivers_number, 1);
+    treatment_control = ones(receivers_number, 1);
+    
+    % get indexes of both of donors and receivers
+    [donors_indexes, receivers_indexes] = get_donors_and_receivers_indexes(fitnesses);
+    
+    for i = 1:receivers_number
+        receiver_index = receivers_indexes(i);
+        
+        % finding random indvidual of donors list
+        donor_index = donors_indexes(get_random_index_of(donors_indexes));
+        
         while treatment_control(i) == 1
-            if t_cr < t_max
-                t_cr = t_cr + 1;
-                x_k_rcv_p = give_plasma(population(k, :), population(m, :));
-                x_k_rcv_p_fit = fitness(x_k_rcv_p);
+            if current_evaluation < maximum_evaluations
+                current_evaluation = current_evaluation + 1;
+                treated_individual = perform_plasma_transfer(population(receiver_index, :), population(donor_index, :));
+                treated_fitness = fitness(treated_individual);
                 if dose_control(i) == 1
-                    if x_k_rcv_p_fit < fitnesses(m)
+                    if treated_fitness < fitnesses(donor_index)
                         dose_control(i) = dose_control(i) + 1;
-                        population(k, :) = x_k_rcv_p;
-                        fitnesses(k) = x_k_rcv_p_fit;
+                        population(receiver_index, :) = treated_individual;
+                        fitnesses(receiver_index) = treated_fitness;
                     else
-                        population(k, :) = population(m, :);
-                        fitnesses(k) = fitnesses(m);
+                        population(receiver_index, :) = population(donor_index, :);
+                        fitnesses(receiver_index) = fitnesses(donor_index);
                         treatment_control(i) = 0;
                     end
                 else
-                    if x_k_rcv_p_fit < fitnesses(k)
-                        population(k, :) = x_k_rcv_p;
-                        fitnesses(k) = x_k_rcv_p_fit;
+                    if treated_fitness < fitnesses(receiver_index)
+                        population(receiver_index, :) = treated_individual;
+                        fitnesses(receiver_index) = treated_fitness;
                     else
                         treatment_control(i) = 0;
                     end
                 end
-                if fitnesses(k) < x_best_fit
-                    x_best = population(k, :);
-                    x_best_fit = fitnesses(k);
-                end
+                compare_with_best_fitness(population(receiver_index, :));
             else
-                break;
+                break; % if exceeded maximum evaluation number
             end
         end
     end
     
-    % donor update
-    for i = 1:NoD
-        if t_cr < t_max
-            t_cr = t_cr + 1;
-            m = d_indexes(i);
-            x_m_dnr = population(m, :);
-            if (t_cr / t_max) < rand()
-                x_m_dnr = update_donor(x_m_dnr);
-                population(m, :) = x_m_dnr;
+    
+    
+    % start of donors updating phase
+    for i = 1:donors_number
+        if current_evaluation < maximum_evaluations
+            current_evaluation = current_evaluation + 1;
+            donor_index = donors_indexes(i);
+            if (current_evaluation / maximum_evaluations) > rand()
+                population(donor_index, :) = update_donor(population(donor_index, :));
             else
-                for j = 1:dim_size
-                    population(m, j) = bound + (rand() * (bound - -bound));
-                end
+                population(donor_index, :) = generate_individual(lower_bound, upper_bound);
             end
-            fitnesses(m) = fitness(population(m, :));
-            
-            if fitnesses(m) < x_best_fit
-                x_best = population(m, :);
-                x_best_fit = fitnesses(m);
-            end
-            
+            fitnesses(donor_index) = fitness(population(donor_index, :));
+            compare_with_best_fitness(population(donor_index, :));
         else
-            break;
+            break; % if exceeded maximum evaluation number
         end
     end
     
 end
+% end of run
 
-disp(x_best_fit);
+% print initial best fitness value
+fprintf('Best fitness value: %d\n', best_fitness);
 
 % ----------------------------------------------------- %
 % --------------------- FUNCTIONS --------------------- %
 % ----------------------------------------------------- %   
 
-function pop = generate_population(LB, UB)
-    global pop_size;
-    global dim_size;
-    pop = zeros(pop_size, 1);
-    for k = 1:pop_size
-        for j = 1:dim_size
-            pop(k, j) = LB + (rand() * (UB - LB));
-        end
+% generating the initial population
+function population = generate_population(LB, UB)
+    global population_size;
+    global dimension_size;
+    population = zeros(population_size, dimension_size);
+    for k = 1:population_size
+        population(k, :) = generate_individual(LB, UB);
     end
 end
 
+% generating just one individual
+function individual = generate_individual(UB, LB)
+    global dimension_size;
+    individual = zeros(1, dimension_size);
+    for j = 1:dimension_size
+        individual(1, j) = LB + (rand() * (UB - LB));
+    end 
+end
 
-function x_k = infect(x_k, x_m)
-    global dim_size;
-    j = randi([1 dim_size]);
+% calculating fitness of all individuals in population
+function fitnesses = calculate_fitnesses(population)
+    global population_size;
+    fitnesses = zeros(population_size, 1);
+    for i = 1:population_size
+       fitnesses(i) = fitness(population(i, :)); 
+    end
+end
+
+% calculation fitness for one individual
+function fit = fitness(x)
+    global objective_function;
+    fit = objective_function(x);
+end
+
+% returns a random index of range 1 to length(x)
+function index = get_random_index_of(x)
+    index = randi([1 length(x)]);
+end
+
+% perform infection between two individuals
+function k = perform_infection(k, m)
+    global dimension_size;
+    j = randi([1 dimension_size]);
     rnd = -1 + 2.*rand();
-    x_k(j) = x_k(j) + rnd * (x_k(j) - x_m(j));
+    k(j) = k(j) + rnd * (k(j) - m(j));
 end
 
-% get lists of indexes of donors and recievers
-function [d_indexes, r_indexes] = get_donors_recievers(fitnesses)
-    global NoD;
-    global NoR;
-    d_indexes = zeros(NoD, 1);
-    r_indexes = zeros(NoR, 1);
+% get lists of indexes of doreceivers_numbers and recievers
+function [donors, receivers] = get_donors_and_receivers_indexes(fitnesses)
+    global donors_number;
+    global receivers_number;
+    donors = zeros(donors_number, 1);
+    receivers = zeros(receivers_number, 1);
     [~, sorted_indexes] = sort(fitnesses);
-    for i = 1:NoD
-        d_indexes(i) = sorted_indexes(i);
+    for i = 1:donors_number
+        donors(i) = sorted_indexes(i);
     end
-    for i = 1:NoR
-        r_indexes(i) = sorted_indexes(end - (i - 1));
+    for i = 1:receivers_number
+        receivers(i) = sorted_indexes(end - (i - 1));
     end
 end
 
-function x_k_rcv = give_plasma(x_k_rcv, x_m_dnr)
-    global dim_size;
-    for j = 1:dim_size
+% performing plasma tranfer from donor to receiver indvidual
+function x_k_rcv = perform_plasma_transfer(x_k_rcv, x_m_dnr)
+    global dimension_size;
+    for j = 1:dimension_size
         rnd = -1 + 2.*rand();
         x_k_rcv(j) = x_k_rcv(j) + rnd * (x_k_rcv(j) - x_m_dnr(j));
     end
 end
 
-% update donor with equation 5
+% updating donor's parameters
 function x_m_dnr = update_donor(x_m_dnr)
-    global dim_size;
-    for j = 1:dim_size
+    global dimension_size;
+    for j = 1:dimension_size
         rnd = -1 + 2.*rand();
         x_m_dnr(j) = x_m_dnr(j) + rnd * x_m_dnr(j);
     end
 end
 
 % compare with best
-function compare_with_best(x)
-    global x_best_fit
-    if fitness(x) < x_best_fit
-        x_best_fit = fitness(x);
+function compare_with_best_fitness(x)
+    global best_fitness
+    if fitness(x) < best_fitness
+        best_fitness = fitness(x);
     end
-end
-
-% sphere function
-function fit = fitness(x)
-    global objective_function;
-    fit = objective_function(x);
 end
