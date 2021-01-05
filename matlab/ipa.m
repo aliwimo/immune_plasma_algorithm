@@ -1,6 +1,6 @@
 % ===================================================== %
 % Implementation of Immune Plasma Algorithm (IPA)       %
-% Introduced by Selcuk Aslan and Sercan Demirci in 2021 %
+% Introduced by Selcuk Aslan and Sercan Demirci in 2020 %
 % Published at:                                         %
 % https://ieeexplore.ieee.org/document/9285244          %
 % ===================================================== %
