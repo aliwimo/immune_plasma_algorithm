@@ -7,6 +7,7 @@ function y = schwefel_1_2(x)
         end
     end
     y = max_value;
+%     y = max(abs(x), [], 2);
 end
 
 
