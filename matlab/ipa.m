@@ -1,3 +1,11 @@
+% ===================================================== %
+% Implementation of Immune Plasma Algorithm (IPA)       %
+% Introduced by Selcuk Aslan and Sercan Demirci in 2021 %
+% Published at:                                         %
+% https://ieeexplore.ieee.org/document/9285244          %
+% ===================================================== %
+
+
 clc;
 clear;
 
@@ -43,7 +51,7 @@ global best_fitness
 best_fitness = min(fitnesses);
 
 % print initial best fitness value
-fprintf('Initial best fitness value: %d\n', best_fitness);
+% fprintf('Initial best fitness value: %d\n', best_fitness);
 
 
 while current_evaluation < maximum_evaluations
@@ -140,7 +148,9 @@ end
 % end of run
 
 % print initial best fitness value
-fprintf('Best fitness value: %d\n', best_fitness);
+% fprintf('Best fitness value: %d\n', best_fitness);
+fprintf('%d\n', best_fitness);
+
 
 % ----------------------------------------------------- %
 % --------------------- FUNCTIONS --------------------- %
