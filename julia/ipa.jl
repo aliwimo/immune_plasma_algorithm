@@ -30,8 +30,9 @@ end
 
 function infect(x_k, x_m)
     j = rand(1:dim_size)
-    x_k[j] += rand(Uniform(-1, 1)) * (x_k[j] - x_m[j])
-    return x_k
+    x = copy(x_k)
+    x[j] = x_k[j] + (rand(Uniform(-1.0, 1.0)) * (x_k[j] - x_m[j]))
+    return x
 end
 
 # get lists of indexes of donors and receivers
@@ -69,7 +70,7 @@ function compare_with_best(x)
     if fitness(x) < x_best_fit
         global x_best = copy(x)
         global x_best_fit = fitness(x)
-        println(x_best_fit)
+        # println(x_best_fit)
     end
 end
 
@@ -90,6 +91,10 @@ x_best_fit = fitnesses[x_best_index]
 
 println(x_best_fit)
 
+Better = 0
+Bad = 0
+here = 0
+
 while t_cr < t_max
 
     # infection distirbution
@@ -100,19 +105,18 @@ while t_cr < t_max
             while m == k
                 m = rand(1:pop_size)
             end
-            x_k = copy(population[k, :])
-            x_m = copy(population[m, :])
-            x_k_inf = infect(x_k, x_m)
+            x_k = population[k, :]
+            x_m = population[m, :]
+            x_k_inf = infect(population[k, :], population[m, :])
             x_k_inf_fit = fitness(x_k_inf)
+            global here += 1
             if x_k_inf_fit < fitnesses[k]
+                global Better += 1
                 population[k, :] = copy(x_k_inf)
                 fitnesses[k] = x_k_inf_fit
                 compare_with_best(x_k_inf)
-                # if x_k_inf_fit < x_best_fit
-                #     global x_best = copy(x_k_inf)
-                #     global x_best_fit = x_k_inf_fit
-                #     # println(x_best_fit)
-                # end
+            else
+                global Bad += 1
             end
         else
             break
@@ -125,7 +129,7 @@ while t_cr < t_max
     treatment_control = ones(Int64, NoR)
     for i = 1:NoR
         k = r_indexes[i]
-        m = Int(rand(1:NoD))
+        m = d_indexes[Int(rand(1:NoD))]
         while treatment_control[i] == 1
             if t_cr < t_max
                 global t_cr += 1
@@ -149,7 +153,6 @@ while t_cr < t_max
                         treatment_control[i] = 0
                     end
                 end
-
                 compare_with_best(population[k, :])
             else
                 break
@@ -172,7 +175,6 @@ while t_cr < t_max
                 end
             end
             fitnesses[m] = fitness(population[m, :])
-            
             compare_with_best(population[m, :])
         else
             break
@@ -180,4 +182,8 @@ while t_cr < t_max
     end
 end
 
-println(x_best_fit)
+println("----------")
+println("Best: $x_best_fit")
+println("Here: $here")
+println("Better: $Better")
+println("Bad: $Bad")
