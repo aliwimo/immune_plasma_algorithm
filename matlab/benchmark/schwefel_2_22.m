@@ -9,3 +9,6 @@ function fit = schwefel_2_22(x)
     fit = total_sum + total_mul;
 end
 
+% bounds [-10, 10]
+% maximum evaluations 200,000
+% optimal 0.0

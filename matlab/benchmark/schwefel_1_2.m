@@ -1,13 +1,18 @@
 function fit = schwefel_1_2(x)
     dimension_size = length(x);
     max_value = abs(x(1));
-    for i = 1:dimension_size
-        if abs(x(i)) > max_value
+    for i = 2:dimension_size
+        if max_value < abs(x(i))
             max_value = abs(x(i));
         end
     end
     fit = max_value;
 end
+
+
+% bounds [-100, 100]
+% maximum evaluations 500,000
+% optimal 0.0
 
 % function fit = schwefel_1_2(x)
 %     dimension_size = length(x);

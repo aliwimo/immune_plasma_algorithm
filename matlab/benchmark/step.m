@@ -7,3 +7,8 @@ function fit = step(x)
     fit = total_sum;
 end
 
+% bounds [-100, 100]
+% maximum evaluations 150,000
+% optimal 0.0
+
+
