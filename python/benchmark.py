@@ -68,3 +68,20 @@ def rosenbrock(x):
     for i in range(dimension_size - 1):
         total_sum += ( 100 * (x[i + 1] - x[i]**2)**2 + (x[i] - 1)**2 )
     return total_sum
+
+
+def schwefel(x):
+    dimension_size = len(x)
+    total_sum = 0
+    for i in range(dimension_size):
+        total_sum += ((x[i]) * np.sin(np.sqrt(abs(x[i]))))
+    return -total_sum
+
+# function fit = schwefel(x)
+#     dimension_size = length(x);
+#     total_sum = 0;
+#     for i = 1:dimension_size
+#         total_sum = total_sum + ((x(i)) * sin(sqrt(abs(x(i)))));
+#     end
+#     fit = -total_sum;
+# end
