@@ -3,8 +3,9 @@ function y = schwefel_2_22(x)
     sum = 0;
     prod = 1;
     for i = 1:D
-        sum = sum + abs(x(i));
-        prod = prod * abs(x(i));
+        absx = abs(x(i));
+        sum = sum + absx;
+        prod = prod * absx;
     end
     y = sum + prod;
 end
