@@ -18,17 +18,19 @@ global population_size;
 global dimension_size;
 global donors_number;
 global receivers_number;
+global lower_bound;
+global upper_bound;
 
 % set objective function from the list in "benchmark" directory
-objective_function = @sphere;
+objective_function = @ackley;
 
 % set initial parameters' values
 population_size = 30;
 dimension_size = 30;
-donors_number = 1;
-receivers_number = 1;
+donors_number = 3;
+receivers_number = 3;
 maximum_evaluations = 150000;
-bounds = [-100, 100];
+bounds = [-30, 30];
 
 % other dependent parameters, no need to change
 current_evaluation = population_size;
@@ -39,6 +41,8 @@ upper_bound = bounds(2);
 % ----------------------------------------------------- %
 % ---------------- START OF ALGORITHM ----------------- %
 % ----------------------------------------------------- %   
+% start timer
+tic
 
 % generating initial population
 population = generate_population(lower_bound, upper_bound);
@@ -50,8 +54,10 @@ fitnesses = calculate_fitnesses(population);
 global best_fitness
 best_fitness = min(fitnesses);
 
-% print initial best fitness value
-% fprintf('Initial best fitness value: %d\n', best_fitness);
+% print initial best fitness value and other statistics
+fprintf('Initial best fitness value: %d\n', best_fitness);
+fprintf('Number of parameters: %d\n', dimension_size);
+fprintf('Population size: %d\n', population_size);
 
 
 while current_evaluation < maximum_evaluations
@@ -148,9 +154,10 @@ end
 % end of run
 
 % print initial best fitness value
-% fprintf('Best fitness value: %d\n', best_fitness);
-fprintf('%d\n', best_fitness);
+fprintf('Best fitness value: %d\n', best_fitness);
 
+% stop timer
+toc
 
 % ----------------------------------------------------- %
 % --------------------- FUNCTIONS --------------------- %
@@ -201,6 +208,19 @@ function k = perform_infection(k, m)
     j = randi([1 dimension_size]);
     rnd = -1 + 2.*rand();
     k(j) = k(j) + rnd * (k(j) - m(j));
+    k(j) = check_bounds(k(j));
+end
+
+% check if exceeded bounds
+function y = check_bounds(x)
+    global lower_bound;
+    global upper_bound;
+    if x > upper_bound
+        x = upper_bound;
+    elseif x < lower_bound
+        x = lower_bound;
+    end
+    y = x;
 end
 
 % get lists of indexes of doreceivers_numbers and recievers
@@ -224,6 +244,7 @@ function x_k_rcv = perform_plasma_transfer(x_k_rcv, x_m_dnr)
     for j = 1:dimension_size
         rnd = -1 + 2.*rand();
         x_k_rcv(j) = x_k_rcv(j) + rnd * (x_k_rcv(j) - x_m_dnr(j));
+        x_k_rcv(j) = check_bounds(x_k_rcv(j));
     end
 end
 
@@ -233,6 +254,7 @@ function x_m_dnr = update_donor(x_m_dnr)
     for j = 1:dimension_size
         rnd = -1 + 2.*rand();
         x_m_dnr(j) = x_m_dnr(j) + rnd * x_m_dnr(j);
+        x_m_dnr(j) = check_bounds(x_m_dnr(j));
     end
 end
 
