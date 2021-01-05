@@ -1,12 +1,12 @@
-function fit = griewank(x)
-    dimension_size = length(x);
-    total_sum = 0;
-    total_prod = 1;
-    for i = 1:dimension_size
-        total_sum = total_sum + x(i)^2 / 4000;
-        total_prod = total_prod * cos(x(i) / sqrt(i));
+function y = griewank(x)
+    D = length(x);
+    sum = 0;
+    prod = 1;
+    for i = 1:D
+        sum = sum + x(i)^2 / 4000;
+        prod = prod * cos(x(i) / sqrt(i));
     end
-    fit = total_sum - total_prod + 1;
+    y = sum - prod + 1;
 end
 
 % bounds [-600, 600]

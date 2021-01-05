@@ -1,5 +1,5 @@
-function fit = sphere(x)
-    fit = sumsqr(x(1,:));
+function y = sphere(x)
+    y = sumsqr(x(1,:));
 end
 
 % bounds [-100, 100]

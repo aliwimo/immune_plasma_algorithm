@@ -1,10 +1,10 @@
-function fit = rastrigin(x)
-    dimension_size = length(x);
-    total_sum = 0;
-    for i = 1:dimension_size
-        total_sum = total_sum + ( x(i)^2 - (10 * cos(2 * pi * x(i))) + 10 );
+function y = rastrigin(x)
+    D = length(x);
+    sum = 0;
+    for i = 1:D
+        sum = sum + ( x(i)^2 - (10 * cos(2 * pi * x(i))) + 10 );
     end
-    fit = total_sum;
+    y = sum;
 end
 
 % bounds [-5.12, 5.12]

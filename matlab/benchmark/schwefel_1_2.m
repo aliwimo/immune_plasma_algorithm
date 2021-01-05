@@ -1,12 +1,12 @@
-function fit = schwefel_1_2(x)
-    dimension_size = length(x);
+function y = schwefel_1_2(x)
+    D = length(x);
     max_value = abs(x(1));
-    for i = 2:dimension_size
+    for i = 2:D
         if max_value < abs(x(i))
             max_value = abs(x(i));
         end
     end
-    fit = max_value;
+    y = max_value;
 end
 
 
