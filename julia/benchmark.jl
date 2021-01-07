@@ -73,3 +73,16 @@ function rosenbrock(x)
     end
     return sum
 end
+
+# bounds +/- 10
+# maximum evaluations 200,000
+function schwefel_2_22(x)
+    D = length(x)
+    sum = 0
+    prod = 1
+    for i = 1:D
+        sum += abs(x[i])
+        prod *= abs(x[i])
+    end
+    return sum + prod
+end
