@@ -62,3 +62,14 @@ function rastrigin(x)
     end
     return sum
 end
+
+# bounds +/- 30
+# maximum evaluations 500,000
+function rosenbrock(x)
+    D = length(x)
+    sum = 0
+    for i = 1:(D - 1)
+        sum += 100 * (x[i + 1] - x[i]^2)^2 + (x[i] - 1)^2
+    end
+    return sum
+end
