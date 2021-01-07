@@ -1,4 +1,3 @@
-
 # bounds +/- 100
 # maximum evaluations 150,000
 function sphere(x)
@@ -96,4 +95,15 @@ function schwefel(x)
         sum += x[i] * sin( sqrt( abs( x[i] ) ) )
     end
     return -sum
+end
+
+# bounds +/- 100
+# maximum evaluations 150,000
+function step(x)
+    D = length(x)
+    sum = 0
+    for i = 1:D
+        sum += ((floor(x[i] + 0.5)) ^ 2);
+    end
+    return sum
 end
