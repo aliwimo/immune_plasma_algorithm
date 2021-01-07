@@ -124,7 +124,6 @@ population = generate_population()
 # calculating fitness of population
 fitnesses = calculate_fitnesses(population)
 
-
 # finding best individual fitness
 best_fitness = minimum(fitnesses)
 
@@ -135,85 +134,87 @@ println("Population size: $population_size")
 
 while current_evaluation < maximum_evaluations
 
-    # perform_infectionion distirbution
-    for k = 1:population_size
+    # start of infection phase
+    for index = 1:population_size
         if current_evaluation < maximum_evaluations
             global current_evaluation += 1
-            m = rand(1:population_size)
-            while m == k
-                m = rand(1:population_size)
+            random_index = rand(1:population_size)
+            while random_index == index
+                random_index = rand(1:population_size)
             end
-            x_k = population[k, :]
-            x_m = population[m, :]
-            x_k_inf = perform_infection(population[k, :], population[m, :])
-            x_k_inf_fit = fitness(x_k_inf)
-            if x_k_inf_fit < fitnesses[k]
-                population[k, :] = copy(x_k_inf)
-                fitnesses[k] = x_k_inf_fit
-                compare_with_best_fitness(x_k_inf)
+            current_individual = population[index, :]
+            random_individual = population[random_index, :]
+            infected_individual = perform_infection(current_individual, random_individual)
+            fitness_of_infected = fitness(infected_individual)
+            if fitness_of_infected < fitnesses[index]
+                population[index, :] = copy(infected_individual)
+                fitnesses[index] = fitness_of_infected
+                compare_with_best_fitness(infected_individual)
             end
         else
-            break
+            break # if exceeded maximum evaluation number
         end
     end
 
-    # plasma transfer
+    # start of plasma transfering phase
+    #generating dose_control and treatment_control vectors
     dose_control = ones(Int64, receivers_number)
-    d_indexes, r_indexes = get_donors_and_receivers_indexes(fitnesses)
     treatment_control = ones(Int64, receivers_number)
+
+    # get indexes of both of donors and receivers
+    donors_indexes, receivers_indexes = get_donors_and_receivers_indexes(fitnesses)
+    
     for i = 1:receivers_number
-        k = r_indexes[i]
-        m = d_indexes[Int(rand(1:donors_number))]
+        receiver_index = receivers_indexes[i]
+        random_donor_index = donors_indexes[Int(rand(1:donors_number))]
+        current_receiver = population[receiver_index, :]
+        random_donor = population[random_donor_index, :]
         while treatment_control[i] == 1
             if current_evaluation < maximum_evaluations
                 global current_evaluation += 1
-                x_k_rcv_p = perform_plasma_transfer(population[k, :], population[m, :])
-                x_k_rcv_p_fit = fitness(x_k_rcv_p)
+                treated_individual = perform_plasma_transfer(current_receiver, random_donor)
+                treated_fitness = fitness(treated_individual)
                 if dose_control[i] == 1
-                    if x_k_rcv_p_fit < fitnesses[m]
+                    if treated_fitness < fitnesses[random_donor_index]
                         dose_control[i] += 1
-                        population[k, :] = copy(x_k_rcv_p)
-                        fitnesses[k] = x_k_rcv_p_fit
+                        population[receiver_index, :] = copy(treated_individual)
+                        fitnesses[receiver_index] = treated_fitness
                     else
-                        population[k, :] = copy(population[m, :])
-                        fitnesses[k] = fitnesses[m]
+                        population[receiver_index, :] = copy(random_donor)
+                        fitnesses[receiver_index] = fitnesses[random_donor_index]
                         treatment_control[i] = 0
                     end
                 else
-                    if x_k_rcv_p_fit < fitnesses[k]
-                        population[k, :] = copy(x_k_rcv_p)
-                        fitnesses[k] = x_k_rcv_p_fit
+                    if treated_fitness < fitnesses[receiver_index]
+                        population[receiver_index, :] = copy(treated_individual)
+                        fitnesses[receiver_index] = treated_fitness
                     else
                         treatment_control[i] = 0
                     end
                 end
-                compare_with_best_fitness(population[k, :])
+                compare_with_best_fitness(population[receiver_index, :])
             else
-                break
+                break # if exceeded maximum evaluation number
             end
         end
     end
 
-    # Donor update
+    # start of donors updating phase
     for i = 1:donors_number
         if current_evaluation < maximum_evaluations
             global current_evaluation += 1
-            m = d_indexes[i]
-            x_m_dnr = copy(population[m, :])
+            donor_index = donors_indexes[i]
             if (current_evaluation / maximum_evaluations) > rand()
-                x_m_dnr = update_donor(x_m_dnr)
-                population[m, :] = copy(x_m_dnr)
+                population[donor_index, :] = update_donor(population[donor_index, :])
             else
-                for j = 1:dimension_size
-                    population[m, j] = lower_bound + rand() * (upper_bound - lower_bound)
-                end
+                population[donor_index, :] = generate_individual()
             end
-            fitnesses[m] = fitness(population[m, :])
-            compare_with_best_fitness(population[m, :])
+            fitnesses[donor_index] = fitness(population[donor_index, :])
+            compare_with_best_fitness(population[donor_index, :])
         else
-            break
+            break # if exceeded maximum evaluation number
         end
     end
 end
 
-println("Best: $best_fitness")
+println("Best fitness value: $best_fitness")
