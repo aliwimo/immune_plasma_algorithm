@@ -86,3 +86,14 @@ function schwefel_2_22(x)
     end
     return sum + prod
 end
+
+# bounds +/- 500
+# maximum evaluations 300,000
+function schwefel(x)
+    D = length(x)
+    sum = 0
+    for i = 1:D
+        sum += x[i] * sin( sqrt( abs( x[i] ) ) )
+    end
+    return -sum
+end
