@@ -40,3 +40,14 @@ function griewank(x)
     end
     return sum - prod + 1
 end
+
+# bounds +/- 1.28
+# maximum evaluations 300,000
+function quartic(x)
+    D = length(x)
+    sum = 0
+    for i = 1:D
+        sum += i * (x[i]^4)
+    end
+    return sum + rand()
+end
