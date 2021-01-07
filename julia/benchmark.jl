@@ -51,3 +51,14 @@ function quartic(x)
     end
     return sum + rand()
 end
+
+# bounds +/- 5.12
+# maximum evaluations 300,000
+function rastrigin(x)
+    D = length(x)
+    sum = 0
+    for i = 1:D
+        sum += (x[i]^2 - (10 * cos(2 * pi * x[i])) + 10);
+    end
+    return sum
+end
