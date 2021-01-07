@@ -11,13 +11,19 @@ NoD = 1
 NoR = 1
 
 function generate_population()
-    population = zeros(Float64, pop_size, dim_size)
+    population = zeros(pop_size, dim_size)
     for k = 1:pop_size
-        for j = 1:dim_size
-            population[k, j] = LB + rand() * (UB - LB)
-        end
+        population[k, :] = generate_individual()
     end
     return population
+end
+
+function generate_individual()
+    individual = zeros(1, dim_size)
+    for i = 1:dim_size
+        individual[1, i] = LB + rand() * (UB - LB)
+    end
+    return individual
 end
 
 function fitness(x)
@@ -89,11 +95,7 @@ x_best_index = argmin(fitnesses)
 x_best = copy(population[x_best_index, :])
 x_best_fit = fitnesses[x_best_index]
 
-println(x_best_fit)
-
-Better = 0
-Bad = 0
-here = 0
+println("Initial Best: $x_best_fit")
 
 while t_cr < t_max
 
@@ -109,14 +111,10 @@ while t_cr < t_max
             x_m = population[m, :]
             x_k_inf = infect(population[k, :], population[m, :])
             x_k_inf_fit = fitness(x_k_inf)
-            global here += 1
             if x_k_inf_fit < fitnesses[k]
-                global Better += 1
                 population[k, :] = copy(x_k_inf)
                 fitnesses[k] = x_k_inf_fit
                 compare_with_best(x_k_inf)
-            else
-                global Bad += 1
             end
         else
             break
@@ -182,8 +180,4 @@ while t_cr < t_max
     end
 end
 
-println("----------")
 println("Best: $x_best_fit")
-println("Here: $here")
-println("Better: $Better")
-println("Bad: $Bad")
