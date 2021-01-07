@@ -26,6 +26,18 @@ function generate_individual()
     return individual
 end
 
+function calculate_fitnesses(population)
+    fitnesses = zeros(pop_size, 1)
+    for i = 1:pop_size
+        fitnesses[i] = fitness(population[i, :])
+    end
+    return fitnesses
+end
+
+function calculate_fitness(individual)
+    # here will be something
+end
+
 function fitness(x)
     sum = 0
     for j = 1:dim_size
