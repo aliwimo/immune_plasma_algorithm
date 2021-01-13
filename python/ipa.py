@@ -184,4 +184,4 @@ while current_evaluation < maximum_evaluations:
             break # if exceeded maximum evaluation number
 
 # print best fitness value in scientific notation
-print(f"Best fitness value: {best_fitness}")
+print(f"Best fitness value: {best_fitness:.6e}")
