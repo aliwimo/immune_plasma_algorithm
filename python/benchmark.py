@@ -1,87 +1,115 @@
 import numpy as np
 
-# ========================================================
-# Sphere Function
-# Dimensions: d, xi = [-5.12, 5.12], for all i = 1, .., d.
-# Global minimum 0 at (0, ..., 0)
-# ========================================================
-def sphere(X):
-    return sum(x ** 2 for x in X)
-
-# ========================================================
-# Bohchevsky Function
-# Dimensions: 2, xi = [-100, 100], for all i = 1, .., d.
-# Global minimum 0 at (0, ..., 0)
-# ========================================================
-def Bohchevsky(X):
-    x1 = X[0]
-    x2 = X[1]
-    eq = (x1 ** 2) + 2 * (x2 ** 2) - 0.3 * np.cos((3 * np.pi * x1) + (4 * np.pi * x2)) + 0.3
-    return eq
-
-# ========================================================
-# Booth Function
-# Dimensions: 2, xi = [-10, 10], for all i = 1, .., d.
-# Global minimum 0 at (1, 3)
-# ========================================================
-def Booth(X):
-    x1 = X[0]
-    x2 = X[1]
-    eq = ((x1 + 2 * x2 - 7) ** 2) + ((2 * x1 + x2 - 5) ** 2)
-    return eq
-
-# ========================================================
-# Drop-Wave Function
-# Dimensions: 2, xi = [-5.12, 5.12], for all i = 1, 2.
-# Global minimum -1 at (0, 0)
-# ========================================================
-def drop_wave(X):
-    up = 1 + np.cos(12 * np.sqrt((X[0] ** 2) + (X[1] ** 2)))
-    down = 0.5 * ((X[0] ** 2) + (X[1] ** 2)) + 2
-    return -up / down
-
-
-# ========================================================
-# Eggholder Function
-# Dimensions: 2, xi = [-512, 512], for all i = 1, 2.
-# Global minimum -959.6407 at (512, 404.2319)
-# ========================================================
-def eggholder(X):
-    x1 = X[0]
-    x2 = X[1]
-    eq1 = -(x2 + 47) * np.sin(np.sqrt(abs(x2 + (x1 / 2) + 47)))
-    eq2 = x1 * np.sin(np.sqrt(abs(x1 - (x2 + 47))))
-    return eq1 - eq2
-
-
-
-
-def schwefel_2_22(X):
-    abs_list = list(map(abs, X))
-    inner_sum = np.sum(abs_list)
-    inner_prod = np.prod(abs_list)
-    return inner_sum + inner_prod
-
-def rosenbrock(x):
-    dimension_size = len(x)
+# bounds +/- 100
+# maximum evaluations 150,000
+def sphere(x):
+    D = len(x)
     total_sum = 0
-    for i in range(dimension_size - 1):
-        total_sum += ( 100 * (x[i + 1] - x[i]**2)**2 + (x[i] - 1)**2 )
+    for i in range(D):
+        total_sum += (x[i] ** 2)
     return total_sum
 
+# bounds +/- 32
+# maximum evaluations 150,000
+def ackley(x):
+    D = len(x)
+    a = 20
+    b = 0.2
+    c = 2 * np.pi
+    sum1 = 0
+    sum2 = 0
+    for i in range(D):
+        sum1 += (x[i] ** 2)
+        sum2 += np.cos(c * x[i])
+    term1 = -a * np.exp(-b * np.sqrt(sum1 / D))
+    term2 = -np.exp(sum2 / D)
+    return term1 + term2 + a + np.exp(1)
 
-def schwefel(x):
-    dimension_size = len(x)
+# bounds +/- 600
+# maximum evaluations 200,000
+def griewank(x):
+    D = len(x)
     total_sum = 0
-    for i in range(dimension_size):
-        total_sum += ((x[i]) * np.sin(np.sqrt(abs(x[i]))))
+    total_prod = 1
+    for i in range(D):
+        total_sum += ((x[i] ** 2) / 4000)
+        total_prod *= np.cos(x[i] / np.sqrt(i + 1))
+    return total_sum - total_prod + 1
+
+# bounds +/- 1.28
+# maximum evaluations 300,000
+def quartic(x):
+    D = len(x)
+    total_sum = 0
+    for i in range(D):
+        total_sum += i * (x[i] ** 4)
+    return total_sum + np.random.rand()
+
+# bounds +/- 5.12
+# maximum evaluations 300,000
+def rastrigin(x):
+    D = len(x)
+    total_sum = 0
+    for i in range(D):
+        total_sum += ((x[i] ** 2) - (10 * np.cos(2 * np.pi * x[i])) + 10)
+    return total_sum
+
+# bounds +/- 30
+# maximum evaluations 500,000
+def rosenbrock(x):
+    D = len(x)
+    total_sum = 0
+    for i in range(D - 1):
+        total_sum += 100 * (x[i + 1] - x[i] ** 2) ** 2 + (x[i] - 1) ** 2
+    return total_sum
+
+# bounds +/- 10
+# maximum evaluations 200,000
+def schwefel_2_22(x):
+    D = len(x)
+    total_sum = 0
+    total_prod = 1
+    for i in range(D):
+        total_sum += abs(x[i])
+        total_prod *= abs(x[i])
+    return total_sum + total_prod
+
+# bounds +/- 500
+# maximum evaluations 300,000
+def schwefel(x):
+    D = len(x)
+    total_sum = 0
+    for i in range(D):
+        total_sum += x[i] * np.sin( np.sqrt( abs( x[i] ) ) )
     return -total_sum
 
-# function fit = schwefel(x)
-#     dimension_size = length(x);
-#     total_sum = 0;
-#     for i = 1:dimension_size
-#         total_sum = total_sum + ((x(i)) * sin(sqrt(abs(x(i)))));
-#     end
-#     fit = -total_sum;
-# end
+# bounds +/- 100
+# maximum evaluations 150,000
+def step(x):
+    D = len(x)
+    total_sum = 0
+    for i in range(D):
+        total_sum += ((np.floor(x[i] + 0.5)) ** 2)
+    return total_sum
+
+# bounds +/- 100
+# maximum evaluations 500,000
+def schwefel_2_21(x):
+    D = len(x)
+    max_value = abs(x[1])
+    for i in range(D):
+        if abs(x[i]) > max_value:
+            max_value = abs(x[i])
+    return max_value
+
+# bounds +/- 100
+# maximum evaluations 500,000
+def schwefel_1_2(x):
+    D = len(x)
+    total_sum = 0
+    for i in range(D):
+        inner_sum = 0
+        for j in range(i):
+            inner_sum += x[j]
+        total_sum += inner_sum ** 2
+    return total_sum
