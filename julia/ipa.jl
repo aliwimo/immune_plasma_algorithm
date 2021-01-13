@@ -1,8 +1,12 @@
 using Distributions
 using Printf
+using Dates
 
 # importing benchmark functions' file
 include("benchmark.jl")
+
+# start timer
+start_time = Dates.now()
 
 # set objective function from the list in "benchmark" file
 objective_function = sphere
@@ -217,6 +221,11 @@ while current_evaluation < maximum_evaluations
         end
     end
 end
+
+# print elapsed time
+end_time = Dates.now()
+total_time = (Dates.value(end_time) - Dates.value(start_time)) / 1000
+@printf("Elapsed time: %.2f seconds\n", total_time)
 
 # print best fitness value in scientific notation
 @printf("Best fitness value: %.6e\n", best_fitness)

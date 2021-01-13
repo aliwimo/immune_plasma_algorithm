@@ -1,6 +1,10 @@
 import numpy as np
 from random import choice, random
 import benchmark
+import time
+
+# start timer
+start_time = time.time()
 
 # set objective function from the list in "benchmark" file
 objective_function = benchmark.sphere
@@ -182,6 +186,10 @@ while current_evaluation < maximum_evaluations:
             compare_with_best_fitness(population[donor_index])
         else:
             break # if exceeded maximum evaluation number
+
+# print elapsed time
+end_time = time.time()
+print(f"Elapsed time: {(end_time - start_time):.2f} seconds")
 
 # print best fitness value in scientific notation
 print(f"Best fitness value: {best_fitness:.6e}")
