@@ -107,3 +107,31 @@ function step(x)
     end
     return sum
 end
+
+# bounds +/- 100
+# maximum evaluations 500,000
+function schwefel_2_21(x)
+    D = length(x)
+    max_value = abs(x[1])
+    for i = 2:D
+        if abs(x[i]) > max_value
+            max_value = abs(x[i])
+        end
+    end
+    return max_value
+end
+
+# bounds +/- 100
+# maximum evaluations 500,000
+function schwefel_1_2(x)
+    D = length(x)
+    total_sum = 0
+    for i = 1:D
+        inner_sum = 0
+        for j = 1:i
+            inner_sum += x[j]
+        end
+        total_sum += inner_sum^2
+    end
+    return total_sum
+end
