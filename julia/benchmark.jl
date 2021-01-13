@@ -57,7 +57,7 @@ function rastrigin(x)
     D = length(x)
     sum = 0
     for i = 1:D
-        sum += (x[i]^2 - (10 * cos(2 * pi * x[i])) + 10);
+        sum += (x[i]^2 - (10 * cos(2 * pi * x[i])) + 10)
     end
     return sum
 end
@@ -103,7 +103,7 @@ function step(x)
     D = length(x)
     sum = 0
     for i = 1:D
-        sum += ((floor(x[i] + 0.5)) ^ 2);
+        sum += ((floor(x[i] + 0.5)) ^ 2)
     end
     return sum
 end

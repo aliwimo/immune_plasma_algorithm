@@ -1,4 +1,5 @@
 using Distributions
+using Printf
 
 # importing benchmark functions' file
 include("benchmark.jl")
@@ -157,7 +158,7 @@ while current_evaluation < maximum_evaluations
     end
 
     # start of plasma transfering phase
-    #generating dose_control and treatment_control vectors
+    # generating dose_control and treatment_control vectors
     dose_control = ones(Int64, receivers_number)
     treatment_control = ones(Int64, receivers_number)
 
@@ -217,4 +218,5 @@ while current_evaluation < maximum_evaluations
     end
 end
 
-println("Best fitness value: $best_fitness")
+# print best fitness value in scientific notation
+@printf("Best fitness value: %.6e\n", best_fitness)
